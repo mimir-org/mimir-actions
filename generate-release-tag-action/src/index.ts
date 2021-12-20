@@ -1,8 +1,8 @@
-import core from "@actions/core";
+import * as core from "@actions/core";
 import { bumpReleaseTag, getVersioningScheme } from "./utils";
 import { getLatestReleaseTag, getRelatedPullRequestLabel, pushTag } from "./octo";
 
-(async () => {
+const run = async () => {
   try {
     const token = core.getInput("github_token");
     const prefix = core.getInput("prefix");
@@ -25,4 +25,6 @@ import { getLatestReleaseTag, getRelatedPullRequestLabel, pushTag } from "./octo
   } catch (error: any) {
     core.setFailed(error.message);
   }
-})();
+};
+
+run();

@@ -6,6 +6,25 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -15,32 +34,30 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __importDefault(__nccwpck_require__(2186));
+const core = __importStar(__nccwpck_require__(2186));
 const utils_1 = __nccwpck_require__(918);
 const octo_1 = __nccwpck_require__(696);
-(() => __awaiter(void 0, void 0, void 0, function* () {
+const run = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const token = core_1.default.getInput("github_token");
-        const prefix = core_1.default.getInput("prefix");
+        const token = core.getInput("github_token");
+        const prefix = core.getInput("prefix");
         const [currentReleaseTag, labelName] = yield Promise.all([
             (0, octo_1.getLatestReleaseTag)(token),
             (0, octo_1.getRelatedPullRequestLabel)(token),
         ]);
-        core_1.default.info(`Found current release tag: ${currentReleaseTag}`);
-        core_1.default.info(`Found label name: ${labelName}`);
+        core.info(`Found current release tag: ${currentReleaseTag}`);
+        core.info(`Found label name: ${labelName}`);
         const newReleaseTag = (0, utils_1.bumpReleaseTag)(currentReleaseTag, (0, utils_1.getVersioningScheme)(labelName), prefix);
-        core_1.default.info(`Create new release tag: ${newReleaseTag}`);
+        core.info(`Create new release tag: ${newReleaseTag}`);
         yield (0, octo_1.pushTag)(token, newReleaseTag);
-        core_1.default.setOutput("new_tag", newReleaseTag);
+        core.setOutput("new_tag", newReleaseTag);
     }
     catch (error) {
-        core_1.default.setFailed(error.message);
+        core.setFailed(error.message);
     }
-}))();
+});
+run();
 
 
 /***/ }),
@@ -50,6 +67,25 @@ const octo_1 = __nccwpck_require__(696);
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -59,53 +95,50 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.pushTag = exports.getRelatedPullRequestLabel = exports.getLatestReleaseTag = void 0;
-const github_1 = __importDefault(__nccwpck_require__(5438));
+const github = __importStar(__nccwpck_require__(5438));
 const utils_1 = __nccwpck_require__(918);
 const getLatestReleaseTag = (token) => __awaiter(void 0, void 0, void 0, function* () {
-    const octokit = github_1.default.getOctokit(token);
+    const octokit = github.getOctokit(token);
     const release = yield octokit.rest.repos.getLatestRelease({
-        owner: github_1.default.context.repo.owner,
-        repo: github_1.default.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
     });
     return release.data.tag_name;
 });
 exports.getLatestReleaseTag = getLatestReleaseTag;
 const getRelatedPullRequestLabel = (token) => __awaiter(void 0, void 0, void 0, function* () {
-    const octokit = github_1.default.getOctokit(token);
+    const octokit = github.getOctokit(token);
     const pullRequests = yield octokit.rest.pulls.list({
-        owner: github_1.default.context.repo.owner,
-        repo: github_1.default.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         sort: "updated",
         direction: "desc",
         state: "closed",
         per_page: 100,
     });
-    const pull = pullRequests.data.find((p) => p.merge_commit_sha === github_1.default.context.sha);
+    const pull = pullRequests.data.find((p) => p.merge_commit_sha === github.context.sha);
     if (!pull)
         return "";
     return (0, utils_1.getValidLabelName)(pull.labels);
 });
 exports.getRelatedPullRequestLabel = getRelatedPullRequestLabel;
 const pushTag = (token, tag) => __awaiter(void 0, void 0, void 0, function* () {
-    const octokit = github_1.default.getOctokit(token);
+    const octokit = github.getOctokit(token);
     yield octokit.rest.git.createTag({
-        owner: github_1.default.context.repo.owner,
-        repo: github_1.default.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         tag,
         type: "commit",
-        object: github_1.default.context.sha,
+        object: github.context.sha,
         message: `Release ${tag}`,
     });
     yield octokit.rest.git.createRef({
-        owner: github_1.default.context.repo.owner,
-        repo: github_1.default.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         ref: `refs/tags/${tag}`,
-        sha: github_1.default.context.sha,
+        sha: github.context.sha,
     });
 });
 exports.pushTag = pushTag;
