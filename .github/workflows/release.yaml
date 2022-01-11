@@ -24,6 +24,13 @@ jobs:
         run: |
           npm run all
 
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "New build of generate-release-tag-action "
+          commit_user_name: Henrik Knudsen
+          commit_user_email: henrik.knudsen@bouvet.no
+          commit_author: Henrik Knudsen <henrik.knudsen@bouvet.no>
+
   create-release:
     needs: [build-generate-release-tag-action]
     runs-on: ubuntu-latest
@@ -33,7 +40,7 @@ jobs:
 
       - name: Bump version and push tag
         id: tag_version
-        uses: mimir-org/mimir-actions/generate-release-tag-action@main
+        uses: ./generate-release-tag-action
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           prefix: "v"
