@@ -16,6 +16,7 @@ jobs:
           node-version: "14"
 
       - name: Install dependencies
+        working-directory: generate-release-tag-action
         run: npm ci
 
       - name: Run tests, build and package dist.
