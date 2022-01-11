@@ -48,6 +48,8 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         ]);
         core.info(`Found current release tag: ${currentReleaseTag}`);
         core.info(`Found label name: ${labelName}`);
+        if (labelName.length === 0)
+            return;
         const newReleaseTag = (0, utils_1.bumpReleaseTag)(currentReleaseTag, (0, utils_1.getVersioningScheme)(labelName), prefix);
         core.info(`Create new release tag: ${newReleaseTag}`);
         yield (0, octo_1.pushTag)(token, newReleaseTag);

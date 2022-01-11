@@ -15,6 +15,8 @@ const run = async () => {
     core.info(`Found current release tag: ${currentReleaseTag}`);
     core.info(`Found label name: ${labelName}`);
 
+    if (labelName.length === 0) return;
+
     const newReleaseTag = bumpReleaseTag(currentReleaseTag, getVersioningScheme(labelName), prefix);
 
     core.info(`Create new release tag: ${newReleaseTag}`);
