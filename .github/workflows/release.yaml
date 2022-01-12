@@ -42,7 +42,7 @@ jobs:
 
       - name: Bump version and push tag
         id: tag_version
-        uses: ./generate-release-tag-action
+        uses: generate-release-tag-action
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           prefix: "v"
