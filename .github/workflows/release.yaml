@@ -31,31 +31,3 @@ jobs:
           commit_user_email: henrik.knudsen@bouvet.no
           commit_author: Henrik Knudsen <henrik.knudsen@bouvet.no>
 
-  create-release:
-    needs: [build-generate-release-tag-action]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      
-      - run: ls
-
-      - name: Bump version and push tag
-        id: tag_version
-        uses: generate-release-tag-action
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          prefix: "v"
-
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release  ${{ steps.tag_version.outputs.new_tag }}
-          generate_release_notes: true
-
-      - name: Check Output Parameters
-        run: |
-          echo "Tag: ${{ steps.release.outputs.new_tag }}"
-          echo "Version: ${{ steps.release.outputs.new_version }}"
-
