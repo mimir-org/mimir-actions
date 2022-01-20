@@ -103,18 +103,14 @@ jobs:
           # More: https://github.com/moby/buildkit#--export-cache-options
           # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
           cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
-          outputs: ${{ inputs.upload_artefact && 'type=docker,dest=/tmp/${{ inputs.repository }}'}}
-
-      - name: Check artefact
-        run: |
-          ls -a /tmp/
+          outputs: ${{ inputs.upload_artefact && format('type=docker,dest=/tmp/{0}', inputs.repository)}}
 
       - name: Upload artifact
         if: inputs.upload_artefact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}-${{ github.sha }}-${{ inputs.target }}
-          path: /tmp/${{ inputs.repository }}.tar
+          path: /tmp/${{ inputs.repository }}
           retention-days: 1
 
       # Currently, cache entries are not removed using local cache: https://github.com/docker/build-push-action/issues/252
