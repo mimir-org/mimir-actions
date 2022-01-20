@@ -125,4 +125,4 @@ jobs:
       - name: Set outputs
         if: inputs.upload_artefact
         run: |
-          echo "::set-output name=artefact_name::'${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}-${{ github.sha }}-${{ inputs.target }}'"
+          echo "::set-output name=artefact_name::${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}-${{ github.sha }}-${{ inputs.target }}"
