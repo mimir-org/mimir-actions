@@ -7,7 +7,7 @@ on:
         required: true
         type: string
         description: Repository to use for docker image.
-      tags: 
+      tags:
         required: true
         type: string
         description: Newline delimited string with tags to use for docker image.
@@ -35,74 +35,76 @@ on:
         required: false
         type: boolean
         description: Whether to push image to registry.
-        default: true
+        default: false
     secrets:
       REGISTRY_SERVER_URL:
-        required: true
-        description: Server URL of docker image repository.
+        required: false
+        description: Server URL of docker image repository. Required if pushing to registry.
       REGISTRY_USERNAME:
-        required: true
-        description: Username to login onto docker image repository.
+        required: false
+        description: Username to login onto docker image repository. Required if pushing to registry.
       REGISTRY_PASSWORD:
-        required: true
-        description: Password to login onto docker image repository.
+        required: false
+        description: Password to login onto docker image repository. Required if pushing to registry.
 
 jobs:
-   # This workflow contains a single job called "build"
   build-push-cache:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        images: ${{ secrets.REGISTRY_SERVER_URL }}/${{ inputs.repository }}
-        tags: ${{ inputs.tags }}
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
 
-    - name: Set up Docker Buildx
-      id: buildx
-      uses: docker/setup-buildx-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}
+            ${{ runner.os }}-buildx-${{ inputs.repository }}
 
-    - uses: docker/login-action@v1
-      with:
-        registry: ${{ secrets.REGISTRY_SERVER_URL }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}     
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        if: inputs.push
+        with:
+          images: ${{ secrets.REGISTRY_SERVER_URL }}/${{ inputs.repository }}
+          tags: ${{ inputs.tags }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Cache Docker layers
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}
-          ${{ runner.os }}-buildx-${{ inputs.repository }}
+      - uses: docker/login-action@v1
+        if: inputs.push == 'true'
+        with:
+          registry: ${{ secrets.REGISTRY_SERVER_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-    - name: Build and Push image
-      uses: docker/build-push-action@v2
-      with:
-        context: ${{ inputs.context }}
-        file: ${{ inputs.file }}
-        builder: ${{ steps.buildx.outputs.name }}
-        build-args: ${{ inputs.build_args }}
-        target: ${{ inputs.target }}
-        push: ${{ inputs.push }}
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        # Note the mode=max here
-        # More: https://github.com/moby/buildkit#--export-cache-options
-        # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
-        cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
-    
-    # Currently, cache entries are not removed using local cache: https://github.com/docker/build-push-action/issues/252
-    # Clean and move in new cache, in order to keep cache size small (avoid build crashing because of exceeding max docker cache size)
-    # Can later on opt for github actions (https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#github-cache)
-    #   but it is currently experimental.
-    - name: Move buildx cache
-      run: |
-        rm -rf /tmp/.buildx-cache
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+      ### Build (and potentially push) image ###
+
+      - name: Build and Push image
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ inputs.context }}
+          file: ${{ inputs.file }}
+          builder: ${{ steps.buildx.outputs.name }}
+          build-args: ${{ inputs.build_args }}
+          target: ${{ inputs.target }}
+          push: ${{ inputs.push }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          # Note the mode=max here
+          # More: https://github.com/moby/buildkit#--export-cache-options
+          # And: https://github.com/docker/buildx#--cache-tonametypetypekeyvalue
+          cache-to: type=local,mode=max,dest=/tmp/.buildx-cache-new
+
+      # Currently, cache entries are not removed using local cache: https://github.com/docker/build-push-action/issues/252
+      # Clean and move in new cache, in order to keep cache size small (avoid build crashing because of exceeding max docker cache size)
+      # Can later on opt for github actions (https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md#github-cache)
+      #   but it is currently experimental.
+      - name: Move buildx cache
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
