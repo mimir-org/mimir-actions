@@ -50,10 +50,15 @@ on:
       REGISTRY_PASSWORD:
         required: false
         description: Password to login onto docker image repository. Required if pushing to registry.
-
+    outputs:
+      artefact_name:
+        description: Name of artefact, if uploaded.
+        value: ${{ jobs.build-push-cache.outputs.artefact_name }}
 jobs:
   build-push-cache:
     runs-on: ubuntu-latest
+    outputs:
+      artefact_name: ${{ steps.set_outputs.outputs.artefact_name || "" }}
     steps:
       - uses: actions/checkout@v2
 
@@ -123,6 +128,7 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Set outputs
+        id: set_outputs
         if: inputs.upload_artefact
         run: |
           echo "::set-output name=artefact_name::${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}-${{ github.sha }}-${{ inputs.target }}"
