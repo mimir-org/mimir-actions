@@ -58,7 +58,7 @@ jobs:
   build-push-cache:
     runs-on: ubuntu-latest
     outputs:
-      artefact_name: ${{ steps.set_outputs.outputs.artefact_name || "" }}
+      artefact_name: ${{ steps.set_outputs.outputs.artefact_name }}
     steps:
       - uses: actions/checkout@v2
 
