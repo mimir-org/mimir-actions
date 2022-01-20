@@ -8,7 +8,7 @@ on:
         type: string
         description: Repository to use for docker image.
       tags:
-        required: true
+        required: false
         type: string
         description: Newline delimited string with tags to use for docker image.
       context:
