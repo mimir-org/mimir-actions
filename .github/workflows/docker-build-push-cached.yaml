@@ -50,6 +50,9 @@ on:
       REGISTRY_PASSWORD:
         required: false
         description: Password to login onto docker image repository. Required if pushing to registry.
+    outputs:
+      artefact_name:
+        description: Name of artefact, if image was uploaded. Only set if upload_artefact == true.
 
 jobs:
   build-push-cache:
@@ -106,6 +109,7 @@ jobs:
           outputs: ${{ inputs.upload_artefact && 'type=docker,dest=/tmp/${{ inputs.repository }}'}}
 
       - name: Upload artifact
+        if: inputs.upload_artefact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}-${{ github.sha }}-${{ inputs.target }}
@@ -120,3 +124,8 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      - name: Set outputs
+        if: inputs.upload_artefact
+        run: |
+          echo "::set-output name=artefact_name::'${{ inputs.repository }}-${{ hashFiles(inputs.hash_files_template) }}-${{ github.sha }}-${{ inputs.target }}'"
