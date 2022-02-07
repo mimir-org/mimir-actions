@@ -119,7 +119,7 @@ jobs:
           passwords=(${PASSWORDS})
           for i in "${!registries[@]}"; do
             echo "Log in for registry ${registries[i]}"
-            docker login "${registries[i]}" -u "${usernames[i]}" -p "${password[i]}"
+            echo "${passwords[i]}" | docker login "${registries[i]}" -u "${usernames[i]}" --password-stdin
           done
 
       #  - uses: docker/login-action@v1
