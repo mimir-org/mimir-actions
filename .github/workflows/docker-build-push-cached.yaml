@@ -92,7 +92,7 @@ jobs:
 
           for i in "${!registries[@]}"; do
             echo "parsing registry ${registries[i]}"
-            images+="${registries[i]}/${REPOSITORY}\\n"
+            images+="${registries[i]}/${REPOSITORY},"
           done
 
           echo "::set-output name=images::$images"

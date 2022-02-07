@@ -4,10 +4,13 @@ on:
   push:
     branches: [main]
 
+env:
+  should_run: false
+
 jobs:
   build-generate-release-tag-action:
     runs-on: ubuntu-latest
-    if: ""
+    if: should_run
     steps:
       - name: Checkout
         uses: actions/checkout@v2
