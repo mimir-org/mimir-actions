@@ -72,6 +72,8 @@ on:
 jobs:
   build-push-cache:
     runs-on: ubuntu-latest
+    env:
+      has_registries: inputs.push && secrets.REGISTRY_SERVER_URLS
     outputs:
       artefact_name: ${{ steps.set_outputs.outputs.artefact_name }}
     steps:
@@ -93,7 +95,7 @@ jobs:
       - name: Parse image names
         id: parse_image_names
         shell: bash
-        if: inputs.push && secrets.REGISTRY_SERVER_URLS != ""
+        if: env.has_registries
         env:
           REGISTRIES: ${{secrets.REGISTRY_SERVER_URLS}}
           REPOSITORY: ${{ inputs.repository }}
@@ -114,7 +116,7 @@ jobs:
           echo -e "Images: $images"
 
       - name: Check parsed images
-        if: inputs.push && secrets.REGISTRY_SERVER_URLS != ""
+        if: env.has_registries
         env:
           images: ${{steps.parse_image_names.outputs.images }}
         run: |
@@ -131,7 +133,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Login registries
-        if: inputs.push && secrets.REGISTRY_SERVER_URLS != ""
+        if: env.has_registries
         shell: bash
         env:
           REGISTRIES: ${{secrets.REGISTRY_SERVER_URLS}}
