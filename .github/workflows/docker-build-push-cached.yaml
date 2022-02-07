@@ -101,7 +101,7 @@ jobs:
           images="${images//$'\n'/'%0A'}"
           images="${images//$'\r'/'%0D'}"
 
-          echo -e "::set-output name=images::$images"
+          echo "::set-output name=images::$images"
           echo -e "Images: $images"
 
       - name: Check parsed images
