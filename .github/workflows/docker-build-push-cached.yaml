@@ -101,13 +101,19 @@ jobs:
           echo -e "::set-output name=images::$images"
           echo -e "Images: $images"
 
+      - name: Check parsed images
+        env:
+          images: ${{steps.parse_image_names.outputs.images }}
+        run: |
+          echo $images
+          echo -e $images
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
         if: inputs.push
         with:
-          images: |
-            ${{ steps.parse_image_names.outputs.images }}
+          images: ${{ steps.parse_image_names.outputs.images }}
           tags: ${{ inputs.tags }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
