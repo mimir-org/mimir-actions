@@ -83,8 +83,10 @@ jobs:
           REGISTRIES: ${{secrets.REGISTRY_SERVER_URLS}}
           REPOSITORY: ${{ inputs.repository }}
         run: |
+          SAVEIFS=$IFS
           IFS=$'\n'
           registries=(${REGISTRIES})
+          IFS=$SAVEIFS
 
           images=""
 
