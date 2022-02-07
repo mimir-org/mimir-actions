@@ -80,7 +80,7 @@ jobs:
         uses: docker/metadata-action@v3
         if: inputs.push
         with:
-          images: ${{ secrets.REGISTRY_SERVER_URL != "" && format("{0}/", secrets.REGISTRY_SERVER_URL)}}${{ inputs.repository }}
+          images: ${{ secrets.REGISTRY_SERVER_URL && format("{0}/", secrets.REGISTRY_SERVER_URL)}}${{ inputs.repository }}
           tags: ${{ inputs.tags }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
