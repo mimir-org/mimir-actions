@@ -91,6 +91,7 @@ jobs:
           images=""
 
           for i in "${!registries[@]}"; do
+            echo "parsing registry ${registries[i]}"
             images+="${registries[i]}/${REPOSITORY}\n"
           done
 
