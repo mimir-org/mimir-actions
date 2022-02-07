@@ -92,7 +92,7 @@ jobs:
             images+="${registries[i]}/${REPOSITORY}\n"
           done
 
-          echo -e "::set-output name=images::$images"
+          echo -e '::set-output name=images::"$images"'
           echo -e "Images: $images"
 
       - name: Docker meta
