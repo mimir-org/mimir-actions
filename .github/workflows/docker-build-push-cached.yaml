@@ -128,7 +128,7 @@ jobs:
         uses: docker/metadata-action@v3
         if: inputs.push
         with:
-          images: "${{ steps.parse_image_names.outputs.images }}${{inputs.use_dockerhub && format('{0}/{1}',secrets.DOCKERHUB_ORG,inputs.repository ||'')}}"
+          images: "${{ steps.parse_image_names.outputs.images }}${{inputs.use_dockerhub && format('{0}/{1}',secrets.DOCKERHUB_ORG,inputs.repository) ||''}}"
           tags: ${{ inputs.tags }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
