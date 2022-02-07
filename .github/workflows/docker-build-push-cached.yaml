@@ -92,7 +92,13 @@ jobs:
             images+="${registries[i]}/${REPOSITORY}\n"
           done
 
-          echo -e '::set-output name=images::"$images"'
+          # Github actions do not like multiline strings, have to manually escape.
+
+          images="${images//'%'/'%25'}"
+          images="${images//$'\n'/'%0A'}"
+          images="${images//$'\r'/'%0D'}"
+
+          echo -e "::set-output name=images::$images"
           echo -e "Images: $images"
 
       - name: Docker meta
