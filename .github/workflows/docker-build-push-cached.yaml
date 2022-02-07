@@ -92,14 +92,8 @@ jobs:
 
           for i in "${!registries[@]}"; do
             echo "parsing registry ${registries[i]}"
-            images+="${registries[i]}/${REPOSITORY}\n"
+            images+="${registries[i]}/${REPOSITORY}\\n"
           done
-
-          # Github actions do not like multiline strings, have to manually escape.
-
-          images="${images//'%'/'%25'}"
-          images="${images//$'\n'/'%0A'}"
-          images="${images//$'\r'/'%0D'}"
 
           echo "::set-output name=images::$images"
           echo -e "Images: $images"
