@@ -36,6 +36,11 @@ on:
         required: false
         type: string
         description: Newline delimited string with tags to use for docker image.
+      use_dockerhub:
+        required: false
+        type: boolean
+        description: Whether to log in with docker hub.
+        default: false
       upload_artefact:
         required: false
         type: boolean
@@ -50,6 +55,16 @@ on:
       REGISTRY_PASSWORDS:
         required: false
         description: Passwords to login onto docker image repository, as newline delimited string. Required if pushing to registry.
+      DOCKERHUB_ORG:
+        required: false
+        description: Dockerhub org to prefix repository with, if login with dockerhub.
+      DOCKERHUB_USERNAME:
+        required: false
+        description: Dockerhub username, if login with dockerhub.
+      DOCKERHUB_PASSWORD:
+        required: false
+        description: Dockerhub password, if login with dockerhub.
+
     outputs:
       artefact_name:
         description: Name of artefact, if uploaded.
@@ -78,7 +93,7 @@ jobs:
       - name: Parse image names
         id: parse_image_names
         shell: bash
-        if: inputs.push
+        if: inputs.push && secrets.REGISTRY_SERVER_URLS != ""
         env:
           REGISTRIES: ${{secrets.REGISTRY_SERVER_URLS}}
           REPOSITORY: ${{ inputs.repository }}
@@ -99,6 +114,7 @@ jobs:
           echo -e "Images: $images"
 
       - name: Check parsed images
+        if: inputs.push && secrets.REGISTRY_SERVER_URLS != ""
         env:
           images: ${{steps.parse_image_names.outputs.images }}
         run: |
@@ -110,12 +126,12 @@ jobs:
         uses: docker/metadata-action@v3
         if: inputs.push
         with:
-          images: ${{ steps.parse_image_names.outputs.images }}
+          images: "${{ steps.parse_image_names.outputs.images }}${{if inputs.using_dockerhub && format(',{0}/{1}',secrets.DOCKERHUB_ORG,inputs.repository  )}}"
           tags: ${{ inputs.tags }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Login docker
-        if: inputs.push
+      - name: Login registries
+        if: inputs.push && secrets.REGISTRY_SERVER_URLS != ""
         shell: bash
         env:
           REGISTRIES: ${{secrets.REGISTRY_SERVER_URLS}}
@@ -131,12 +147,12 @@ jobs:
             echo "${passwords[i]}" | docker login "${registries[i]}" -u "${usernames[i]}" --password-stdin
           done
 
-      #  - uses: docker/login-action@v1
-      #   if: inputs.push == true
-      #  with:
-      #   registry: ${{ secrets.REGISTRY_SERVER_URLS }}
-      #  username: ${{ secrets.REGISTRY_USERNAMES }}
-      # password: ${{ secrets.REGISTRY_PASSWORDS }}
+      - name: Login Dockerhub
+        uses: docker/login-action@v1
+        if: inputs.use_dockerhub && inputs.push
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       ### Build (and potentially push) image ###
 

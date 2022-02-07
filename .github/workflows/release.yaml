@@ -10,7 +10,7 @@ env:
 jobs:
   build-generate-release-tag-action:
     runs-on: ubuntu-latest
-    if: should_run
+    if: env.should_run
     steps:
       - name: Checkout
         uses: actions/checkout@v2
