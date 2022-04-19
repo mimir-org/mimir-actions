@@ -5,7 +5,7 @@ inputs:
     description: "Github token to use for octokit requests"
     required: true
   prefix:
-    description: 'Tag prefix to use. Defaults to "v".'
+    description: "Tag prefix to use."
     required: false
 outputs:
   new_tag:
