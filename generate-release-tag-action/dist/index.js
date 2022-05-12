@@ -139,7 +139,7 @@ const getPreviousPreRelease = async (token, rawTag, suffix) => {
     });
     const preReleases = releases.data
         .filter((x) => x.prerelease && x.tag_name.includes(`${rawTag}-${suffix}`))
-        .sort((a, b) => a.tag_name.localeCompare(b.tag_name, undefined, { numeric: true }));
+        .sort((a, b) => b.tag_name.localeCompare(a.tag_name, undefined, { numeric: true }));
     if (preReleases.length === 0)
         return null;
     return preReleases[0].tag_name;
