@@ -20,13 +20,14 @@ try {
     const input = (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .processInputs */ .YW)();
     const [currentReleaseTag, versioningScheme] = await (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .getReleaseTagAndVersioningScheme */ .md)(input);
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Current release: ${currentReleaseTag}`);
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Versioning scheme: ${currentReleaseTag}`);
-    const [newReleaseTag, rawTag] = await (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .generateNewReleaseTag */ .HL)(input, currentReleaseTag, versioningScheme);
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Create new release tag: ${newReleaseTag}`);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Versioning scheme: ${versioningScheme}`);
+    const newReleaseTagRaw = await (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .generateNewReleaseTag */ .HL)(input, currentReleaseTag, versioningScheme);
+    const newReleaseTag = (0,_lib_utils__WEBPACK_IMPORTED_MODULE_3__/* .getTagWithPrefix */ .KW)(newReleaseTagRaw, input.prefix);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Create new release tag: ${newReleaseTag}, raw tag: ${newReleaseTagRaw}`);
     if (input.shouldPushNewTag)
         await (0,_lib_octo__WEBPACK_IMPORTED_MODULE_1__/* .pushTag */ .nq)(input.token, newReleaseTag);
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("new_tag", (0,_lib_utils__WEBPACK_IMPORTED_MODULE_3__/* .getTagWithPrefix */ .KW)(rawTag, input.prefix));
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("raw_tag", rawTag);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("new_tag", newReleaseTag);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("raw_tag", newReleaseTagRaw);
 }
 catch (error) {
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
