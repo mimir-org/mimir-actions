@@ -66,6 +66,7 @@ const processInputs = () => {
     return input;
 };
 const getReleaseTagAndVersioningScheme = async (input) => {
+    var _a;
     const [currentReleaseTag, labelName] = await Promise.all([
         (0,_octo__WEBPACK_IMPORTED_MODULE_2__/* .getLatestReleaseTag */ .rR)(input.token),
         (0,_octo__WEBPACK_IMPORTED_MODULE_2__/* .getRelatedPullRequestLabel */ .Av)(input.token),
@@ -74,7 +75,7 @@ const getReleaseTagAndVersioningScheme = async (input) => {
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("No semantic versioning scheme specified. No release created.");
         process.exit(0);
     }
-    const versioningScheme = (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .getVersioningSchemeFromLabelName */ .Ao)(labelName) ?? input.target;
+    const versioningScheme = (_a = (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .getVersioningSchemeFromLabelName */ .Ao)(labelName)) !== null && _a !== void 0 ? _a : input.target;
     if (!versioningScheme) {
         _actions_core__WEBPACK_IMPORTED_MODULE_0__.error("Invalid versioning scheme provided. Valid pull request label or target must be provided.");
         process.exit(1);
@@ -206,11 +207,12 @@ const PRE_RELEASE_TYPES = {
     patch: "prepatch",
 };
 const getValidLabelName = (labels) => {
+    var _a;
     const labelNames = labels
         .map((label) => label.name)
         .filter((labelName) => !!labelName)
         .filter((labelName) => labelName.includes("release:"));
-    return labelNames[0] ?? "";
+    return (_a = labelNames[0]) !== null && _a !== void 0 ? _a : "";
 };
 const bumpReleaseTag = (prevReleaseTag, versioningScheme, suffix = undefined) => {
     if (!versioningScheme || !isReleaseType(versioningScheme))
@@ -229,8 +231,8 @@ const getTagWithPrefix = (tag, prefix) => {
     return prefix + tag;
 };
 const getVersioningSchemeFromLabelName = (labelName) => {
-    const split = labelName?.split(":");
-    return split?.length === 2 ? split[1] : null;
+    const split = labelName === null || labelName === void 0 ? void 0 : labelName.split(":");
+    return (split === null || split === void 0 ? void 0 : split.length) === 2 ? split[1] : null;
 };
 const isTarget = (versioningScheme) => Object.values(RELEASE_TYPES).includes(versioningScheme);
 const isReleaseType = (versioningScheme) => Object.values(RELEASE_TYPES).includes(versioningScheme) ||
