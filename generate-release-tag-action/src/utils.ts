@@ -19,10 +19,20 @@ export const getValidLabelName = (labels: Labels): string => {
   return labelNames[0] ?? "";
 };
 
-export const bumpReleaseTag = (prevReleaseTag: string, versioningScheme: string, prefix: string) => {
+export const bumpReleaseTag = (prevReleaseTag: string, versioningScheme: string): string => {
   if (!versioningScheme || !isReleaseType(versioningScheme)) return "";
 
-  return prefix + semver.inc(prevReleaseTag, versioningScheme);
+  const tag = semver.inc(prevReleaseTag, versioningScheme);
+
+  if (tag === null) return "";
+
+  return tag;
+};
+
+export const getTagWithPrefix = (tag: string, prefix: string): string => {
+  if (!tag) return "";
+
+  return prefix + tag;
 };
 
 export const getVersioningScheme = (labelName: string | undefined): string => labelName?.split(":")[1] ?? "";

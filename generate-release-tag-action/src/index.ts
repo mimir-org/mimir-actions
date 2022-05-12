@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { bumpReleaseTag, getVersioningScheme } from "./utils";
+import { bumpReleaseTag, getTagWithPrefix, getVersioningScheme } from "./utils";
 import { getLatestReleaseTag, getRelatedPullRequestLabel, pushTag } from "./octo";
 
 const run = async () => {
@@ -17,13 +17,21 @@ const run = async () => {
 
     if (labelName.length === 0) return;
 
-    const newReleaseTag = bumpReleaseTag(currentReleaseTag, getVersioningScheme(labelName), prefix);
+    const rawTag = bumpReleaseTag(currentReleaseTag, getVersioningScheme(labelName));
 
-    core.info(`Create new release tag: ${newReleaseTag}`);
+    if (!rawTag) {
+      core.setFailed(`Invalid semver tag: ${currentReleaseTag}. Could not increment release.`);
+      return;
+    }
 
-    await pushTag(token, newReleaseTag);
+    const prefixTag = getTagWithPrefix(rawTag, prefix);
 
-    core.setOutput("new_tag", newReleaseTag);
+    core.info(`Create new release tag: ${prefixTag}`);
+
+    await pushTag(token, prefixTag);
+
+    core.setOutput("new_tag", prefixTag);
+    core.setOutput("raw_tag", rawTag);
   } catch (error: any) {
     core.setFailed(error.message);
   }

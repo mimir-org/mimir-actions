@@ -50,10 +50,16 @@ const run = () => __awaiter(void 0, void 0, void 0, function* () {
         core.info(`Found label name: ${labelName}`);
         if (labelName.length === 0)
             return;
-        const newReleaseTag = (0, utils_1.bumpReleaseTag)(currentReleaseTag, (0, utils_1.getVersioningScheme)(labelName), prefix);
-        core.info(`Create new release tag: ${newReleaseTag}`);
-        yield (0, octo_1.pushTag)(token, newReleaseTag);
-        core.setOutput("new_tag", newReleaseTag);
+        const rawTag = (0, utils_1.bumpReleaseTag)(currentReleaseTag, (0, utils_1.getVersioningScheme)(labelName));
+        if (!rawTag) {
+            core.setFailed(`Invalid semver tag: ${currentReleaseTag}. Could not increment release.`);
+            return;
+        }
+        const prefixTag = (0, utils_1.getTagWithPrefix)(rawTag, prefix);
+        core.info(`Create new release tag: ${prefixTag}`);
+        yield (0, octo_1.pushTag)(token, prefixTag);
+        core.setOutput("new_tag", prefixTag);
+        core.setOutput("raw_tag", rawTag);
     }
     catch (error) {
         core.setFailed(error.message);
@@ -157,7 +163,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getVersioningScheme = exports.bumpReleaseTag = exports.getValidLabelName = exports.RELEASE_TYPES = void 0;
+exports.getVersioningScheme = exports.getTagWithPrefix = exports.bumpReleaseTag = exports.getValidLabelName = exports.RELEASE_TYPES = void 0;
 const semver_1 = __importDefault(__nccwpck_require__(1383));
 exports.RELEASE_TYPES = {
     Major: "major",
@@ -173,12 +179,21 @@ const getValidLabelName = (labels) => {
     return (_a = labelNames[0]) !== null && _a !== void 0 ? _a : "";
 };
 exports.getValidLabelName = getValidLabelName;
-const bumpReleaseTag = (prevReleaseTag, versioningScheme, prefix) => {
+const bumpReleaseTag = (prevReleaseTag, versioningScheme) => {
     if (!versioningScheme || !isReleaseType(versioningScheme))
         return "";
-    return prefix + semver_1.default.inc(prevReleaseTag, versioningScheme);
+    const tag = semver_1.default.inc(prevReleaseTag, versioningScheme);
+    if (tag === null)
+        return "";
+    return tag;
 };
 exports.bumpReleaseTag = bumpReleaseTag;
+const getTagWithPrefix = (tag, prefix) => {
+    if (!tag)
+        return "";
+    return prefix + tag;
+};
+exports.getTagWithPrefix = getTagWithPrefix;
 const getVersioningScheme = (labelName) => { var _a; return (_a = labelName === null || labelName === void 0 ? void 0 : labelName.split(":")[1]) !== null && _a !== void 0 ? _a : ""; };
 exports.getVersioningScheme = getVersioningScheme;
 const isReleaseType = (versioningScheme) => Object.values(exports.RELEASE_TYPES).includes(versioningScheme);

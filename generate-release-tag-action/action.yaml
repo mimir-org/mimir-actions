@@ -9,7 +9,10 @@ inputs:
     required: false
 outputs:
   new_tag:
-    description: "Tag generated"
+    description: "Tag generated, with potential prefix"
+  raw_tag:
+    description: "Tag generated, without prefix"
+
 runs:
   using: "node12"
   main: "dist/index.js"
