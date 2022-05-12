@@ -2,201 +2,239 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 4822:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
+__nccwpck_require__.a(module, async (__webpack_handle_async_dependencies__) => {
+__nccwpck_require__.r(__webpack_exports__);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _lib_octo__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5611);
+/* harmony import */ var _lib__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(9880);
+/* harmony import */ var _lib_utils__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(1898);
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+
+
+
+try {
+    const input = (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .processInputs */ .YW)();
+    const [currentReleaseTag, versioningScheme] = await (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .getReleaseTagAndVersioningScheme */ .md)(input);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Current release: ${currentReleaseTag}`);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Versioning scheme: ${currentReleaseTag}`);
+    const [newReleaseTag, rawTag] = await (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .generateNewReleaseTag */ .HL)(input, currentReleaseTag, versioningScheme);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Create new release tag: ${newReleaseTag}`);
+    if (input.shouldPushNewTag)
+        await (0,_lib_octo__WEBPACK_IMPORTED_MODULE_1__/* .pushTag */ .nq)(input.token, newReleaseTag);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("new_tag", (0,_lib_utils__WEBPACK_IMPORTED_MODULE_3__/* .getTagWithPrefix */ .KW)(rawTag, input.prefix));
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setOutput("raw_tag", rawTag);
+}
+catch (error) {
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
+    process.exit(1);
+}
+
+__webpack_handle_async_dependencies__();
+}, 1);
+
+/***/ }),
+
+/***/ 9880:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "YW": () => (/* binding */ processInputs),
+/* harmony export */   "md": () => (/* binding */ getReleaseTagAndVersioningScheme),
+/* harmony export */   "HL": () => (/* binding */ generateNewReleaseTag)
+/* harmony export */ });
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1898);
+/* harmony import */ var _octo__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(5611);
+
+
+
+const processInputs = () => {
+    const input = {
+        token: _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("github_token"),
+        target: getValidTarget(_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("target")),
+        prefix: _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("prefix"),
+        suffix: _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("suffix"),
+        shouldPushNewTag: _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("should_push_new_tag") === "true",
+    };
+    return input;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+const getReleaseTagAndVersioningScheme = async (input) => {
+    const [currentReleaseTag, labelName] = await Promise.all([
+        (0,_octo__WEBPACK_IMPORTED_MODULE_2__/* .getLatestReleaseTag */ .rR)(input.token),
+        (0,_octo__WEBPACK_IMPORTED_MODULE_2__/* .getRelatedPullRequestLabel */ .Av)(input.token),
+    ]);
+    if (labelName.length === 0 && !(0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .isTarget */ .hx)(input.target)) {
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("No semantic versioning scheme specified. No release created.");
+        process.exit(0);
+    }
+    const versioningScheme = (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .getVersioningSchemeFromLabelName */ .Ao)(labelName) ?? input.target;
+    if (!versioningScheme) {
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.error("Invalid versioning scheme provided. Valid pull request label or target must be provided.");
+        process.exit(1);
+    }
+    return [currentReleaseTag, versioningScheme];
 };
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(2186));
-const utils_1 = __nccwpck_require__(918);
-const octo_1 = __nccwpck_require__(696);
-const run = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const token = core.getInput("github_token");
-        const prefix = core.getInput("prefix");
-        const [currentReleaseTag, labelName] = yield Promise.all([
-            (0, octo_1.getLatestReleaseTag)(token),
-            (0, octo_1.getRelatedPullRequestLabel)(token),
-        ]);
-        core.info(`Found current release tag: ${currentReleaseTag}`);
-        core.info(`Found label name: ${labelName}`);
-        if (labelName.length === 0)
-            return;
-        const rawTag = (0, utils_1.bumpReleaseTag)(currentReleaseTag, (0, utils_1.getVersioningScheme)(labelName));
-        if (!rawTag) {
-            core.setFailed(`Invalid semver tag: ${currentReleaseTag}. Could not increment release.`);
-            return;
-        }
-        const prefixTag = (0, utils_1.getTagWithPrefix)(rawTag, prefix);
-        core.info(`Create new release tag: ${prefixTag}`);
-        yield (0, octo_1.pushTag)(token, prefixTag);
-        core.setOutput("new_tag", prefixTag);
-        core.setOutput("raw_tag", rawTag);
+const generateNewReleaseTag = async (input, currentReleaseTag, versioningScheme) => {
+    const newReleaseTagRaw = await getNewReleaseTag(input, currentReleaseTag, versioningScheme);
+    if (!newReleaseTagRaw) {
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(`Invalid semver tag: ${currentReleaseTag}. Could not increment release.`);
+        process.exit(1);
     }
-    catch (error) {
-        core.setFailed(error.message);
-    }
-});
-run();
+    return newReleaseTagRaw;
+};
+const getNewReleaseTag = async (input, currentReleaseTag, versioningScheme) => {
+    const newReleaseTagRaw = (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bumpReleaseTag */ .Us)(currentReleaseTag, versioningScheme);
+    if (!input.suffix)
+        return newReleaseTagRaw;
+    const latestPreReleaseTag = await (0,_octo__WEBPACK_IMPORTED_MODULE_2__/* .getPreviousPreRelease */ .NH)(input.token, newReleaseTagRaw, input.suffix);
+    const newReleaseTag = (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bumpPreReleaseTag */ .L5)(input.target, input.suffix, latestPreReleaseTag, currentReleaseTag);
+    return newReleaseTag;
+};
+const getValidTarget = (target) => {
+    if ((0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .isTarget */ .hx)(target))
+        return target;
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(`Invalid target provided: ${target}. Only major, minor, patch are valid values for target.`);
+    process.exit(1);
+};
 
 
 /***/ }),
 
-/***/ 696:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ 5611:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "rR": () => (/* binding */ getLatestReleaseTag),
+/* harmony export */   "NH": () => (/* binding */ getPreviousPreRelease),
+/* harmony export */   "Av": () => (/* binding */ getRelatedPullRequestLabel),
+/* harmony export */   "nq": () => (/* binding */ pushTag)
+/* harmony export */ });
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(5438);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1898);
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.pushTag = exports.getRelatedPullRequestLabel = exports.getLatestReleaseTag = void 0;
-const github = __importStar(__nccwpck_require__(5438));
-const utils_1 = __nccwpck_require__(918);
-const getLatestReleaseTag = (token) => __awaiter(void 0, void 0, void 0, function* () {
-    const octokit = github.getOctokit(token);
-    const release = yield octokit.rest.repos.getLatestRelease({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+
+const getLatestReleaseTag = async (token) => {
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_0__.getOctokit(token);
+    const release = await octokit.rest.repos.getLatestRelease({
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
     });
     return release.data.tag_name;
-});
-exports.getLatestReleaseTag = getLatestReleaseTag;
-const getRelatedPullRequestLabel = (token) => __awaiter(void 0, void 0, void 0, function* () {
-    const octokit = github.getOctokit(token);
-    const pullRequests = yield octokit.rest.pulls.list({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+};
+const getPreviousPreRelease = async (token, rawTag, suffix) => {
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_0__.getOctokit(token);
+    const releases = await octokit.rest.repos.listReleases({
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
+    });
+    const preReleases = releases.data
+        .filter((x) => x.prerelease && x.tag_name.includes(`${rawTag}-${suffix}`))
+        .sort((a, b) => a.tag_name.localeCompare(b.tag_name, undefined, { numeric: true }));
+    if (preReleases.length === 0)
+        return null;
+    return preReleases[0].tag_name;
+};
+const getRelatedPullRequestLabel = async (token) => {
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_0__.getOctokit(token);
+    const pullRequests = await octokit.rest.pulls.list({
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
         sort: "updated",
         direction: "desc",
         state: "closed",
         per_page: 100,
     });
-    const pull = pullRequests.data.find((p) => p.merge_commit_sha === github.context.sha);
+    const pull = pullRequests.data.find((p) => p.merge_commit_sha === _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.sha);
     if (!pull)
         return "";
-    return (0, utils_1.getValidLabelName)(pull.labels);
-});
-exports.getRelatedPullRequestLabel = getRelatedPullRequestLabel;
-const pushTag = (token, tag) => __awaiter(void 0, void 0, void 0, function* () {
-    const octokit = github.getOctokit(token);
-    yield octokit.rest.git.createTag({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+    return (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .getValidLabelName */ .tx)(pull.labels);
+};
+const pushTag = async (token, tag) => {
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_0__.getOctokit(token);
+    await octokit.rest.git.createTag({
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
         tag,
         type: "commit",
-        object: github.context.sha,
+        object: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.sha,
         message: `Release ${tag}`,
     });
-    yield octokit.rest.git.createRef({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
+    await octokit.rest.git.createRef({
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
         ref: `refs/tags/${tag}`,
-        sha: github.context.sha,
+        sha: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.sha,
     });
-});
-exports.pushTag = pushTag;
+};
 
 
 /***/ }),
 
-/***/ 918:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ 1898:
+/***/ ((__unused_webpack_module, __webpack_exports__, __nccwpck_require__) => {
 
 "use strict";
+/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
+/* harmony export */   "tx": () => (/* binding */ getValidLabelName),
+/* harmony export */   "Us": () => (/* binding */ bumpReleaseTag),
+/* harmony export */   "L5": () => (/* binding */ bumpPreReleaseTag),
+/* harmony export */   "KW": () => (/* binding */ getTagWithPrefix),
+/* harmony export */   "Ao": () => (/* binding */ getVersioningSchemeFromLabelName),
+/* harmony export */   "hx": () => (/* binding */ isTarget)
+/* harmony export */ });
+/* unused harmony exports RELEASE_TYPES, PRE_RELEASE_TYPES, isReleaseType */
+/* harmony import */ var semver__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(1383);
+/* harmony import */ var semver__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(semver__WEBPACK_IMPORTED_MODULE_0__);
 
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+const RELEASE_TYPES = {
+    major: "major",
+    minor: "minor",
+    patch: "patch",
 };
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getVersioningScheme = exports.getTagWithPrefix = exports.bumpReleaseTag = exports.getValidLabelName = exports.RELEASE_TYPES = void 0;
-const semver_1 = __importDefault(__nccwpck_require__(1383));
-exports.RELEASE_TYPES = {
-    Major: "major",
-    Minor: "minor",
-    Patch: "patch",
+const PRE_RELEASE_TYPES = {
+    major: "premajor",
+    minor: "preminor",
+    patch: "prepatch",
 };
 const getValidLabelName = (labels) => {
-    var _a;
     const labelNames = labels
         .map((label) => label.name)
         .filter((labelName) => !!labelName)
         .filter((labelName) => labelName.includes("release:"));
-    return (_a = labelNames[0]) !== null && _a !== void 0 ? _a : "";
+    return labelNames[0] ?? "";
 };
-exports.getValidLabelName = getValidLabelName;
-const bumpReleaseTag = (prevReleaseTag, versioningScheme) => {
+const bumpReleaseTag = (prevReleaseTag, versioningScheme, suffix = undefined) => {
     if (!versioningScheme || !isReleaseType(versioningScheme))
-        return "";
-    const tag = semver_1.default.inc(prevReleaseTag, versioningScheme);
-    if (tag === null)
-        return "";
+        return null;
+    const tag = semver__WEBPACK_IMPORTED_MODULE_0___default().inc(prevReleaseTag, versioningScheme, undefined, suffix);
     return tag;
 };
-exports.bumpReleaseTag = bumpReleaseTag;
+const bumpPreReleaseTag = (target, suffix, latestPreReleaseTag, currentReleaseTag) => {
+    return latestPreReleaseTag
+        ? bumpReleaseTag(latestPreReleaseTag, "prerelease", suffix)
+        : bumpReleaseTag(currentReleaseTag, PRE_RELEASE_TYPES[target], suffix);
+};
 const getTagWithPrefix = (tag, prefix) => {
     if (!tag)
-        return "";
+        return null;
     return prefix + tag;
 };
-exports.getTagWithPrefix = getTagWithPrefix;
-const getVersioningScheme = (labelName) => { var _a; return (_a = labelName === null || labelName === void 0 ? void 0 : labelName.split(":")[1]) !== null && _a !== void 0 ? _a : ""; };
-exports.getVersioningScheme = getVersioningScheme;
-const isReleaseType = (versioningScheme) => Object.values(exports.RELEASE_TYPES).includes(versioningScheme);
+const getVersioningSchemeFromLabelName = (labelName) => {
+    const split = labelName?.split(":");
+    return split?.length === 2 ? split[1] : null;
+};
+const isTarget = (versioningScheme) => Object.values(RELEASE_TYPES).includes(versioningScheme);
+const isReleaseType = (versioningScheme) => Object.values(RELEASE_TYPES).includes(versioningScheme) ||
+    Object.values(PRE_RELEASE_TYPES).includes(versioningScheme) ||
+    versioningScheme === "prerelease";
 
 
 /***/ }),
@@ -4592,7 +4630,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var Stream = _interopDefault(__nccwpck_require__(2413));
 var http = _interopDefault(__nccwpck_require__(8605));
 var Url = _interopDefault(__nccwpck_require__(8835));
-var whatwgUrl = _interopDefault(__nccwpck_require__(629));
+var whatwgUrl = _interopDefault(__nccwpck_require__(3323));
 var https = _interopDefault(__nccwpck_require__(7211));
 var zlib = _interopDefault(__nccwpck_require__(8761));
 
@@ -7068,7 +7106,7 @@ module.exports = {
 
 /***/ }),
 
-/***/ 629:
+/***/ 3323:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -9438,7 +9476,7 @@ module.exports = clean
 /***/ 5098:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
-const eq = __nccwpck_require__(1898)
+const eq = __nccwpck_require__(196)
 const neq = __nccwpck_require__(6017)
 const gt = __nccwpck_require__(4123)
 const gte = __nccwpck_require__(5522)
@@ -9588,7 +9626,7 @@ module.exports = compare
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const parse = __nccwpck_require__(5925)
-const eq = __nccwpck_require__(1898)
+const eq = __nccwpck_require__(196)
 
 const diff = (version1, version2) => {
   if (eq(version1, version2)) {
@@ -9614,7 +9652,7 @@ module.exports = diff
 
 /***/ }),
 
-/***/ 1898:
+/***/ 196:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const compare = __nccwpck_require__(4309)
@@ -9869,7 +9907,7 @@ module.exports = {
   rsort: __nccwpck_require__(8701),
   gt: __nccwpck_require__(4123),
   lt: __nccwpck_require__(194),
-  eq: __nccwpck_require__(1898),
+  eq: __nccwpck_require__(196),
   neq: __nccwpck_require__(6017),
   gte: __nccwpck_require__(5522),
   lte: __nccwpck_require__(7520),
@@ -9885,7 +9923,7 @@ module.exports = {
   validRange: __nccwpck_require__(2098),
   outside: __nccwpck_require__(420),
   gtr: __nccwpck_require__(9380),
-  ltr: __nccwpck_require__(3323),
+  ltr: __nccwpck_require__(8726),
   intersects: __nccwpck_require__(7008),
   simplifyRange: __nccwpck_require__(5297),
   subset: __nccwpck_require__(7863),
@@ -10196,7 +10234,7 @@ module.exports = intersects
 
 /***/ }),
 
-/***/ 3323:
+/***/ 8726:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 const outside = __nccwpck_require__(420)
@@ -11694,6 +11732,120 @@ module.exports = require("zlib");
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/async module */
+/******/ 	(() => {
+/******/ 		var webpackThen = typeof Symbol === "function" ? Symbol("webpack then") : "__webpack_then__";
+/******/ 		var webpackExports = typeof Symbol === "function" ? Symbol("webpack exports") : "__webpack_exports__";
+/******/ 		var completeQueue = (queue) => {
+/******/ 			if(queue) {
+/******/ 				queue.forEach((fn) => (fn.r--));
+/******/ 				queue.forEach((fn) => (fn.r-- ? fn.r++ : fn()));
+/******/ 			}
+/******/ 		}
+/******/ 		var completeFunction = (fn) => (!--fn.r && fn());
+/******/ 		var queueFunction = (queue, fn) => (queue ? queue.push(fn) : completeFunction(fn));
+/******/ 		var wrapDeps = (deps) => (deps.map((dep) => {
+/******/ 			if(dep !== null && typeof dep === "object") {
+/******/ 				if(dep[webpackThen]) return dep;
+/******/ 				if(dep.then) {
+/******/ 					var queue = [];
+/******/ 					dep.then((r) => {
+/******/ 						obj[webpackExports] = r;
+/******/ 						completeQueue(queue);
+/******/ 						queue = 0;
+/******/ 					});
+/******/ 					var obj = {};
+/******/ 												obj[webpackThen] = (fn, reject) => (queueFunction(queue, fn), dep.catch(reject));
+/******/ 					return obj;
+/******/ 				}
+/******/ 			}
+/******/ 			var ret = {};
+/******/ 								ret[webpackThen] = (fn) => (completeFunction(fn));
+/******/ 								ret[webpackExports] = dep;
+/******/ 								return ret;
+/******/ 		}));
+/******/ 		__nccwpck_require__.a = (module, body, hasAwait) => {
+/******/ 			var queue = hasAwait && [];
+/******/ 			var exports = module.exports;
+/******/ 			var currentDeps;
+/******/ 			var outerResolve;
+/******/ 			var reject;
+/******/ 			var isEvaluating = true;
+/******/ 			var nested = false;
+/******/ 			var whenAll = (deps, onResolve, onReject) => {
+/******/ 				if (nested) return;
+/******/ 				nested = true;
+/******/ 				onResolve.r += deps.length;
+/******/ 				deps.map((dep, i) => (dep[webpackThen](onResolve, onReject)));
+/******/ 				nested = false;
+/******/ 			};
+/******/ 			var promise = new Promise((resolve, rej) => {
+/******/ 				reject = rej;
+/******/ 				outerResolve = () => (resolve(exports), completeQueue(queue), queue = 0);
+/******/ 			});
+/******/ 			promise[webpackExports] = exports;
+/******/ 			promise[webpackThen] = (fn, rejectFn) => {
+/******/ 				if (isEvaluating) { return completeFunction(fn); }
+/******/ 				if (currentDeps) whenAll(currentDeps, fn, rejectFn);
+/******/ 				queueFunction(queue, fn);
+/******/ 				promise.catch(rejectFn);
+/******/ 			};
+/******/ 			module.exports = promise;
+/******/ 			body((deps) => {
+/******/ 				if(!deps) return outerResolve();
+/******/ 				currentDeps = wrapDeps(deps);
+/******/ 				var fn, result;
+/******/ 				var promise = new Promise((resolve, reject) => {
+/******/ 					fn = () => (resolve(result = currentDeps.map((d) => (d[webpackExports]))));
+/******/ 					fn.r = 0;
+/******/ 					whenAll(currentDeps, fn, reject);
+/******/ 				});
+/******/ 				return fn.r ? promise : result;
+/******/ 			}).then(outerResolve, reject);
+/******/ 			isEvaluating = false;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
@@ -11702,7 +11854,7 @@ module.exports = require("zlib");
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	// This entry module used 'module' so it can't be inlined
 /******/ 	var __webpack_exports__ = __nccwpck_require__(4822);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	

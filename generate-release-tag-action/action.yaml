@@ -1,12 +1,23 @@
 name: "Generate Release Tag Action"
-description: "Creates custom tag based on Pull Request Labels"
+description: "Creates custom release tag, based on Pull Request Labels or action input"
 inputs:
   github_token:
     description: "Github token to use for octokit requests"
     required: true
-  prefix:
-    description: "Tag prefix to use."
+  target:
+    description: "Specify versioning scheme to use. Alternative to pull request labels. Either major, minor or patch."
     required: false
+  prefix:
+    description: "Tag prefix to use, e.g. 'v'."
+    required: false
+  suffix:
+    description: "Tag suffix to use, e.g. prerelease"
+    required: false
+
+  should_push_new_tag:
+    description: "Whether to push the newly generated release tag"
+    required: false
+    default: "true"
 outputs:
   new_tag:
     description: "Tag generated, with potential prefix"
