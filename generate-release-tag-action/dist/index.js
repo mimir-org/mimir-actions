@@ -18,7 +18,7 @@ __nccwpck_require__.r(__webpack_exports__);
 
 try {
     const input = (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .processInputs */ .YW)();
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Received input: ${input}`);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Received input: ${JSON.stringify(input)}`);
     const [currentReleaseTag, versioningScheme] = await (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .getReleaseTagAndVersioningScheme */ .md)(input);
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Current release: ${currentReleaseTag}`);
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Versioning scheme: ${versioningScheme}`);

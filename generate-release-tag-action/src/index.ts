@@ -6,7 +6,7 @@ import { getTagWithPrefix } from "./lib/utils";
 try {
   const input = processInputs();
 
-  core.info(`Received input: ${input}`);
+  core.info(`Received input: ${JSON.stringify(input)}`);
 
   const [currentReleaseTag, versioningScheme] = await getReleaseTagAndVersioningScheme(input);
 
