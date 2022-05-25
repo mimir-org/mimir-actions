@@ -52,11 +52,6 @@ describe("BumpReleaseTag produces valid version", () => {
     expect(newReleaseTag).toEqual("v1.2.1-rc.0");
   });
 
-  test("should produce no tag on missing versioning scheme", () => {
-    const newReleaseTag = getTagWithPrefix(bumpReleaseTag(PREV_RELEASE_TAG, ""), "v");
-    expect(newReleaseTag).toEqual(null);
-  });
-
   test("should produce valid version, when no prefix is given", () => {
     const newReleaseTag = getTagWithPrefix(bumpReleaseTag(PREV_RELEASE_TAG, RELEASE_TYPES.major), "");
     expect(newReleaseTag).toEqual("2.0.0");

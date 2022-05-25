@@ -56,14 +56,13 @@ __webpack_handle_async_dependencies__();
 
 
 const processInputs = () => {
-    const input = {
+    return {
         token: _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("github_token"),
         target: getValidTarget(_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("target")),
         prefix: _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("prefix"),
         suffix: _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("suffix"),
         shouldPushNewTag: _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("should_push_new_tag") === "true",
     };
-    return input;
 };
 const getReleaseTagAndVersioningScheme = async (input) => {
     var _a;
@@ -95,7 +94,7 @@ const getNewReleaseTag = async (input, currentReleaseTag, versioningScheme) => {
     if (!input.suffix)
         return newReleaseTagRaw;
     const latestPreReleaseTag = await (0,_octo__WEBPACK_IMPORTED_MODULE_2__/* .getPreviousPreRelease */ .NH)(input.token, newReleaseTagRaw, input.suffix);
-    const newReleaseTag = (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bumpPreReleaseTag */ .L5)(input.target, input.suffix, latestPreReleaseTag, currentReleaseTag);
+    const newReleaseTag = (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bumpPreReleaseTag */ .L5)(versioningScheme, input.suffix, latestPreReleaseTag, currentReleaseTag);
     return newReleaseTag;
 };
 const getValidTarget = (target) => {
@@ -220,10 +219,10 @@ const bumpReleaseTag = (prevReleaseTag, versioningScheme, suffix = undefined) =>
     const tag = semver__WEBPACK_IMPORTED_MODULE_0___default().inc(prevReleaseTag, versioningScheme, undefined, suffix);
     return tag;
 };
-const bumpPreReleaseTag = (target, suffix, latestPreReleaseTag, currentReleaseTag) => {
+const bumpPreReleaseTag = (versioningScheme, suffix, latestPreReleaseTag, currentReleaseTag) => {
     return latestPreReleaseTag
         ? bumpReleaseTag(latestPreReleaseTag, "prerelease", suffix)
-        : bumpReleaseTag(currentReleaseTag, PRE_RELEASE_TYPES[target], suffix);
+        : bumpReleaseTag(currentReleaseTag, PRE_RELEASE_TYPES[versioningScheme], suffix);
 };
 const getTagWithPrefix = (tag, prefix) => {
     if (!tag)
@@ -232,9 +231,14 @@ const getTagWithPrefix = (tag, prefix) => {
 };
 const getVersioningSchemeFromLabelName = (labelName) => {
     const split = labelName === null || labelName === void 0 ? void 0 : labelName.split(":");
-    return (split === null || split === void 0 ? void 0 : split.length) === 2 ? split[1] : null;
+    if ((split === null || split === void 0 ? void 0 : split.length) !== 2)
+        return null;
+    const scheme = split[1];
+    if (isReleaseType(scheme))
+        return scheme;
+    return null;
 };
-const isTarget = (versioningScheme) => Object.values(RELEASE_TYPES).includes(versioningScheme);
+const isTarget = (versioningScheme) => !!versioningScheme && Object.values(RELEASE_TYPES).includes(versioningScheme);
 const isReleaseType = (versioningScheme) => Object.values(RELEASE_TYPES).includes(versioningScheme) ||
     Object.values(PRE_RELEASE_TYPES).includes(versioningScheme) ||
     versioningScheme === "prerelease";
