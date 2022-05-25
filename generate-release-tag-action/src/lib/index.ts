@@ -69,8 +69,10 @@ const getNewReleaseTag = async (
   return newReleaseTag;
 };
 
-const getValidTarget = (target: string): Target => {
+const getValidTarget = (target: string): Target | undefined => {
   if (isTarget(target)) return target;
+
+  if (target === "") return undefined;
 
   core.error(`Invalid target provided: ${target}. Only major, minor, patch are valid values for target.`);
   process.exit(1);

@@ -18,6 +18,7 @@ __nccwpck_require__.r(__webpack_exports__);
 
 try {
     const input = (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .processInputs */ .YW)();
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Received input: ${input}`);
     const [currentReleaseTag, versioningScheme] = await (0,_lib__WEBPACK_IMPORTED_MODULE_2__/* .getReleaseTagAndVersioningScheme */ .md)(input);
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Current release: ${currentReleaseTag}`);
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Versioning scheme: ${versioningScheme}`);
@@ -100,6 +101,8 @@ const getNewReleaseTag = async (input, currentReleaseTag, versioningScheme) => {
 const getValidTarget = (target) => {
     if ((0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .isTarget */ .hx)(target))
         return target;
+    if (target === "")
+        return undefined;
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(`Invalid target provided: ${target}. Only major, minor, patch are valid values for target.`);
     process.exit(1);
 };
