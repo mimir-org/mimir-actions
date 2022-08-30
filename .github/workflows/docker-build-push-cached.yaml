@@ -45,6 +45,14 @@ on:
         required: false
         type: boolean
         description: Whether to upload image as local artefact. For use between jobs. Will be made available as $repository-$hashFiles(hash_files_template)-$github.sha-$target, with retention of one day.
+      environment_name:
+        required: false
+        type: string
+        description: Environment name to tag job workflow jobs with.
+      environment_url:
+        required: false
+        type: string
+        description: Environment url to tag job workflow jobs with.
     secrets:
       REGISTRY_SERVER_URLS:
         required: false
@@ -74,6 +82,9 @@ on:
 jobs:
   build-push-cache:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.environment_name }}
+      url: ${{ inputs.environment_url }}
     env:
       has_registries: inputs.push && secrets.REGISTRY_SERVER_URLS
     outputs:
