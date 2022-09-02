@@ -18,26 +18,24 @@ export const getPreviousPreRelease = async (
   rawTag: string | null,
   suffix: string
 ): Promise<string | null> => {
-  const octokit = github.getOctokit(token);
-
   core.debug("Getting previous pre-release");
 
-  const releases = await octokit.rest.repos.listReleases({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-  });
+  let latest = "";
+  let page = 1;
 
-  core.debug(`Got ${releases.data.length} releases in total`);
+  while (true) {
+    const release_tag = await getLatestPreReleasePage(rawTag, suffix, token, page);
 
-  const preReleases = releases.data
-    .filter((x) => x.prerelease && x.tag_name.includes(`${rawTag}-${suffix}`))
-    .sort((a, b) => b.tag_name.localeCompare(a.tag_name, undefined, { numeric: true }));
+    if (release_tag === null) break;
 
-  core.debug(`Got ${preReleases.length} pre-releases for the next release in total`);
+    if (release_tag.localeCompare(latest, undefined, { numeric: true }) > 0) {
+      latest = release_tag;
+    }
 
-  if (preReleases.length === 0) return null;
+    page += 1;
+  }
 
-  return preReleases[0].tag_name;
+  return latest;
 };
 
 export const getRelatedPullRequestLabel = async (token: string): Promise<string> => {
@@ -77,4 +75,36 @@ export const pushTag = async (token: string, tag: string) => {
     ref: `refs/tags/${tag}`,
     sha: github.context.sha,
   });
+};
+
+const getLatestPreReleasePage = async (
+  rawTag: string | null,
+  suffix: string,
+  token: string,
+  page: number
+): Promise<string | null> => {
+  const octokit = github.getOctokit(token);
+
+  core.debug(`Getting releases for page: ${page}`);
+
+  const releases = await octokit.rest.repos.listReleases({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    per_page: 100,
+    page,
+  });
+
+  core.debug(`Got ${releases.data.length} releases in total`);
+
+  const preReleases = releases.data
+    .filter((x) => x.prerelease && x.tag_name.includes(`${rawTag}-${suffix}`))
+    .sort((a, b) => b.tag_name.localeCompare(a.tag_name, undefined, { numeric: true }));
+
+  core.debug(`Got ${preReleases.length} pre-releases for the next release in total`);
+
+  if (preReleases.length === 0) return null;
+
+  core.debug(`Latest pre-release retrieved: ${preReleases[0].tag_name}`);
+
+  return preReleases[0].tag_name;
 };

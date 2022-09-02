@@ -142,20 +142,19 @@ const getLatestReleaseTag = async (token) => {
     return release.data.tag_name;
 };
 const getPreviousPreRelease = async (token, rawTag, suffix) => {
-    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Getting previous pre-release");
-    const releases = await octokit.rest.repos.listReleases({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
-    });
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got ${releases.data.length} releases in total`);
-    const preReleases = releases.data
-        .filter((x) => x.prerelease && x.tag_name.includes(`${rawTag}-${suffix}`))
-        .sort((a, b) => b.tag_name.localeCompare(a.tag_name, undefined, { numeric: true }));
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got ${preReleases.length} pre-releases for the next release in total`);
-    if (preReleases.length === 0)
-        return null;
-    return preReleases[0].tag_name;
+    let latest = "";
+    let page = 1;
+    while (true) {
+        const release_tag = await getLatestPreReleasePage(rawTag, suffix, token, page);
+        if (release_tag === null)
+            break;
+        if (release_tag.localeCompare(latest, undefined, { numeric: true }) > 0) {
+            latest = release_tag;
+        }
+        page += 1;
+    }
+    return latest;
 };
 const getRelatedPullRequestLabel = async (token) => {
     const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
@@ -188,6 +187,25 @@ const pushTag = async (token, tag) => {
         ref: `refs/tags/${tag}`,
         sha: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha,
     });
+};
+const getLatestPreReleasePage = async (rawTag, suffix, token, page) => {
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Getting releases for page: ${page}`);
+    const releases = await octokit.rest.repos.listReleases({
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        per_page: 100,
+        page,
+    });
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got ${releases.data.length} releases in total`);
+    const preReleases = releases.data
+        .filter((x) => x.prerelease && x.tag_name.includes(`${rawTag}-${suffix}`))
+        .sort((a, b) => b.tag_name.localeCompare(a.tag_name, undefined, { numeric: true }));
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got ${preReleases.length} pre-releases for the next release in total`);
+    if (preReleases.length === 0)
+        return null;
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Latest pre-release retrieved: ${preReleases[0].tag_name}`);
+    return preReleases[0].tag_name;
 };
 
 
