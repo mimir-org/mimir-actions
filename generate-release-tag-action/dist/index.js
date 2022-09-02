@@ -91,10 +91,15 @@ const generateNewReleaseTag = async (input, currentReleaseTag, versioningScheme)
     return newReleaseTagRaw;
 };
 const getNewReleaseTag = async (input, currentReleaseTag, versioningScheme) => {
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Getting new release tag");
     const newReleaseTagRaw = (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bumpReleaseTag */ .Us)(currentReleaseTag, versioningScheme);
-    if (!input.suffix)
+    if (!input.suffix) {
+        _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("No suffix provided. Returning raw release tag.");
         return newReleaseTagRaw;
+    }
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Suffix provided. Computing pre-release tag.");
     const latestPreReleaseTag = await (0,_octo__WEBPACK_IMPORTED_MODULE_2__/* .getPreviousPreRelease */ .NH)(input.token, newReleaseTagRaw, input.suffix);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Pre-release tag computed: ${latestPreReleaseTag}`);
     const newReleaseTag = (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .bumpPreReleaseTag */ .L5)(versioningScheme, input.suffix, latestPreReleaseTag, currentReleaseTag);
     return newReleaseTag;
 };
@@ -120,62 +125,68 @@ const getValidTarget = (target) => {
 /* harmony export */   "Av": () => (/* binding */ getRelatedPullRequestLabel),
 /* harmony export */   "nq": () => (/* binding */ pushTag)
 /* harmony export */ });
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(5438);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(1898);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(2186);
+/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5438);
+/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(1898);
+
 
 
 const getLatestReleaseTag = async (token) => {
-    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_0__.getOctokit(token);
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
     const release = await octokit.rest.repos.getLatestRelease({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
     });
     return release.data.tag_name;
 };
 const getPreviousPreRelease = async (token, rawTag, suffix) => {
-    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_0__.getOctokit(token);
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Getting previous pre-release");
     const releases = await octokit.rest.repos.listReleases({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
     });
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got ${releases.data.length} releases in total`);
     const preReleases = releases.data
         .filter((x) => x.prerelease && x.tag_name.includes(`${rawTag}-${suffix}`))
         .sort((a, b) => b.tag_name.localeCompare(a.tag_name, undefined, { numeric: true }));
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got ${preReleases.length} pre-releases for the next release in total`);
     if (preReleases.length === 0)
         return null;
     return preReleases[0].tag_name;
 };
 const getRelatedPullRequestLabel = async (token) => {
-    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_0__.getOctokit(token);
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
     const pullRequests = await octokit.rest.pulls.list({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
         sort: "updated",
         direction: "desc",
         state: "closed",
         per_page: 100,
     });
-    const pull = pullRequests.data.find((p) => p.merge_commit_sha === _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.sha);
+    const pull = pullRequests.data.find((p) => p.merge_commit_sha === _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha);
     if (!pull)
         return "";
-    return (0,_utils__WEBPACK_IMPORTED_MODULE_1__/* .getValidLabelName */ .tx)(pull.labels);
+    return (0,_utils__WEBPACK_IMPORTED_MODULE_2__/* .getValidLabelName */ .tx)(pull.labels);
 };
 const pushTag = async (token, tag) => {
-    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_0__.getOctokit(token);
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
     await octokit.rest.git.createTag({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
         tag,
         type: "commit",
-        object: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.sha,
+        object: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha,
         message: `Release ${tag}`,
     });
     await octokit.rest.git.createRef({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.repo.repo,
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
         ref: `refs/tags/${tag}`,
-        sha: _actions_github__WEBPACK_IMPORTED_MODULE_0__.context.sha,
+        sha: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.sha,
     });
 };
 

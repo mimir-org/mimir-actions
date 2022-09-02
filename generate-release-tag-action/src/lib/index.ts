@@ -58,11 +58,20 @@ const getNewReleaseTag = async (
   currentReleaseTag: string,
   versioningScheme: ReleaseType
 ): Promise<string | null> => {
+  core.debug("Getting new release tag");
+
   const newReleaseTagRaw = bumpReleaseTag(currentReleaseTag, versioningScheme);
 
-  if (!input.suffix) return newReleaseTagRaw;
+  if (!input.suffix) {
+    core.debug("No suffix provided. Returning raw release tag.");
+    return newReleaseTagRaw;
+  }
+
+  core.debug("Suffix provided. Computing pre-release tag.");
 
   const latestPreReleaseTag = await getLatestPreReleaseTag(input.token, newReleaseTagRaw, input.suffix);
+
+  core.debug(`Pre-release tag computed: ${latestPreReleaseTag}`);
 
   const newReleaseTag = bumpPreReleaseTag(versioningScheme, input.suffix, latestPreReleaseTag, currentReleaseTag);
 

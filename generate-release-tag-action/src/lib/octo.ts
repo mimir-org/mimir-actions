@@ -1,3 +1,4 @@
+import * as core from "@actions/core";
 import * as github from "@actions/github";
 import { getValidLabelName } from "./utils";
 
@@ -19,14 +20,20 @@ export const getPreviousPreRelease = async (
 ): Promise<string | null> => {
   const octokit = github.getOctokit(token);
 
+  core.debug("Getting previous pre-release");
+
   const releases = await octokit.rest.repos.listReleases({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
   });
 
+  core.debug(`Got ${releases.data.length} releases in total`);
+
   const preReleases = releases.data
     .filter((x) => x.prerelease && x.tag_name.includes(`${rawTag}-${suffix}`))
     .sort((a, b) => b.tag_name.localeCompare(a.tag_name, undefined, { numeric: true }));
+
+  core.debug(`Got ${preReleases.length} pre-releases for the next release in total`);
 
   if (preReleases.length === 0) return null;
 
