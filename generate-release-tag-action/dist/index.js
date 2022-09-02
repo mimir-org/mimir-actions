@@ -149,11 +149,12 @@ const getPreviousPreRelease = async (token, rawTag, suffix) => {
         repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
         ref: `tags/${rawTag}-${suffix}`,
     });
-    const preReleases = refs.data.sort((a, b) => b.ref.localeCompare(a.ref, undefined, { numeric: true }));
-    if (preReleases.length === 0)
+    if (refs.data.length === 0)
         return null;
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Latest pre-release retrieved: ${preReleases[0].ref}`);
-    return preReleases[0].ref;
+    const preReleaseRefsSorted = refs.data.sort((a, b) => b.ref.localeCompare(a.ref, undefined, { numeric: true }));
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Latest pre-release tag retrieved: ${preReleaseRefsSorted[0].ref}`);
+    const preReleaseTag = preReleaseRefsSorted[0].ref.split("/")[2];
+    return preReleaseTag;
 };
 /* export const getPreviousPreRelease = async (
   token: string,

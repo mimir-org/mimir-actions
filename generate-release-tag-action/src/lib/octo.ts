@@ -28,13 +28,16 @@ export const getPreviousPreRelease = async (
     ref: `tags/${rawTag}-${suffix}`,
   });
 
-  const preReleases = refs.data.sort((a, b) => b.ref.localeCompare(a.ref, undefined, { numeric: true }));
+  if (refs.data.length === 0) return null;
 
-  if (preReleases.length === 0) return null;
+  const preReleaseRefsSorted = refs.data.sort((a, b) => b.ref.localeCompare(a.ref, undefined, { numeric: true }));
 
-  core.debug(`Latest pre-release retrieved: ${preReleases[0].ref}`);
+  core.debug(`Latest pre-release tag retrieved: ${preReleaseRefsSorted[0].ref}`);
 
-  return preReleases[0].ref;
+  // ref is always of the form refs/tags/{tag}
+  const preReleaseTag = preReleaseRefsSorted[0].ref.split("/")[2];
+
+  return preReleaseTag;
 };
 
 /* export const getPreviousPreRelease = async (
