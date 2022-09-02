@@ -143,19 +143,42 @@ const getLatestReleaseTag = async (token) => {
 };
 const getPreviousPreRelease = async (token, rawTag, suffix) => {
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Getting previous pre-release");
-    let latest = "";
-    let page = 1;
-    while (true) {
-        const release_tag = await getLatestPreReleasePage(rawTag, suffix, token, page);
-        if (release_tag === null)
-            break;
-        if (release_tag.localeCompare(latest, undefined, { numeric: true }) > 0) {
-            latest = release_tag;
-        }
-        page += 1;
-    }
-    return latest;
+    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
+    const refs = await octokit.request("GET /repos/{owner}/{repo}/git/matching-refs/{ref}", {
+        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        ref: `tags/${rawTag}-${suffix}`,
+    });
+    const preReleases = refs.data.sort((a, b) => b.ref.localeCompare(a.ref, undefined, { numeric: true }));
+    if (preReleases.length === 0)
+        return null;
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Latest pre-release retrieved: ${preReleases[0].ref}`);
+    return preReleases[0].ref;
 };
+/* export const getPreviousPreRelease = async (
+  token: string,
+  rawTag: string | null,
+  suffix: string
+): Promise<string | null> => {
+  core.debug("Getting previous pre-release");
+
+  let latest = "";
+  let page = 1;
+
+  while (true) {
+    const release_tag = await getLatestPreReleasePage(rawTag, suffix, token, page);
+
+    if (release_tag === null) break;
+
+    if (release_tag.localeCompare(latest, undefined, { numeric: true }) > 0) {
+      latest = release_tag;
+    }
+
+    page += 1;
+  }
+
+  return latest;
+}; */
 const getRelatedPullRequestLabel = async (token) => {
     const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
     const pullRequests = await octokit.rest.pulls.list({
@@ -189,22 +212,22 @@ const pushTag = async (token, tag) => {
     });
 };
 const getLatestPreReleasePage = async (rawTag, suffix, token, page) => {
-    const octokit = _actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit(token);
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Getting releases for page: ${page}`);
+    const octokit = github.getOctokit(token);
+    core.debug(`Getting releases for page: ${page}`);
     const releases = await octokit.rest.repos.listReleases({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
         per_page: 100,
         page,
     });
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got ${releases.data.length} releases in total`);
+    core.debug(`Got ${releases.data.length} releases in total`);
     const preReleases = releases.data
         .filter((x) => x.prerelease && x.tag_name.includes(`${rawTag}-${suffix}`))
         .sort((a, b) => b.tag_name.localeCompare(a.tag_name, undefined, { numeric: true }));
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Got ${preReleases.length} pre-releases for the next release in total`);
+    core.debug(`Got ${preReleases.length} pre-releases for the next release in total`);
     if (preReleases.length === 0)
         return null;
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(`Latest pre-release retrieved: ${preReleases[0].tag_name}`);
+    core.debug(`Latest pre-release retrieved: ${preReleases[0].tag_name}`);
     return preReleases[0].tag_name;
 };
 

@@ -20,6 +20,30 @@ export const getPreviousPreRelease = async (
 ): Promise<string | null> => {
   core.debug("Getting previous pre-release");
 
+  const octokit = github.getOctokit(token);
+
+  const refs = await octokit.request("GET /repos/{owner}/{repo}/git/matching-refs/{ref}", {
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    ref: `tags/${rawTag}-${suffix}`,
+  });
+
+  const preReleases = refs.data.sort((a, b) => b.ref.localeCompare(a.ref, undefined, { numeric: true }));
+
+  if (preReleases.length === 0) return null;
+
+  core.debug(`Latest pre-release retrieved: ${preReleases[0].ref}`);
+
+  return preReleases[0].ref;
+};
+
+/* export const getPreviousPreRelease = async (
+  token: string,
+  rawTag: string | null,
+  suffix: string
+): Promise<string | null> => {
+  core.debug("Getting previous pre-release");
+
   let latest = "";
   let page = 1;
 
@@ -36,7 +60,7 @@ export const getPreviousPreRelease = async (
   }
 
   return latest;
-};
+}; */
 
 export const getRelatedPullRequestLabel = async (token: string): Promise<string> => {
   const octokit = github.getOctokit(token);
