@@ -53,6 +53,11 @@ on:
         required: false
         type: string
         description: Environment url to tag job workflow jobs with.
+      checkout_recursive:
+        required: false
+        type: boolean
+        default: false
+        description: Whether to check out git repository recursively with action/checkout.
     secrets:
       REGISTRY_SERVER_URLS:
         required: false
@@ -91,6 +96,8 @@ jobs:
       artefact_name: ${{ steps.set_outputs.outputs.artefact_name }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodule: ${{ inputs.checkout_recursive && 'recursive' }} || 'false'
 
       - name: Set up Docker Buildx
         id: buildx
